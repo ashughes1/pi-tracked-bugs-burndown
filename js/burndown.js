@@ -432,16 +432,29 @@
         }
     }
     
-    const tracking_fx55 = queryString.cf_tracking_firefox55;
-    if (tracking_fx55) {
-        searchTerms.push(["cf_tracking_firefox55", tracking_fx55]);
+    const tracking = find_tracking_flag(queryString);
+    if (tracking != -1) {
+        var key = "cf_tracking_firefox" + tracking;
+        var value = queryString[key];
+        searchTerms.push([key, value]);
     }
 
     searchAndPlotBugs(searchTerms);
 
     const searchValues = [];
     for (let [key, value] of searchTerms) {
-        searchValues.push(value);
+        searchValues.push(key + ":" + value);
     }
     document.title = "Burndown: " + searchValues.join(", ");
 })(this);
+
+function find_tracking_flag(queryString) {
+    var keys = Object.keys(queryString);
+    var version = -1;
+    for (var i=0; i<keys.length; i++) {
+        if (keys[i].search("cf_tracking_firefox") != -1) {
+            version = keys[i].split("firefox")[1];
+        }
+    }
+    return version;
+}
